@@ -1,6 +1,7 @@
 import numpy as np
 from random import shuffle
 
+
 def softmax_loss_naive(W, X, y, reg):
   """
   Softmax loss function, naive implementation (with loops)
@@ -24,12 +25,24 @@ def softmax_loss_naive(W, X, y, reg):
   dW = np.zeros_like(W)
 
   #############################################################################
-  # TODO: Compute the softmax loss and its gradient using explicit loops.     #
   # Store the loss in loss and the gradient in dW. If you are not careful     #
   # here, it is easy to run into numeric instability. Don't forget the        #
   # regularization!                                                           #
   #############################################################################
-  pass
+  D, C = W.shape
+  N = X.shape[0]
+  for i in xrange(N):
+    scores = X[i].dot(W)
+    scores = np.exp(scores)
+    cor = scores[y[i]]
+    norm = np.sum(scores)
+    loss += -np.log(cor) + np.log(norm)
+    dW += X[i].reshape(-1, 1) * scores / norm
+    dW[:, y[i]] -= X[i].T
+  loss /= N
+  loss += reg * 0.5 * np.sum(W * W)
+  dW /= N
+  dW += reg * W
   #############################################################################
   #                          END OF YOUR CODE                                 #
   #############################################################################
@@ -48,15 +61,27 @@ def softmax_loss_vectorized(W, X, y, reg):
   dW = np.zeros_like(W)
 
   #############################################################################
-  # TODO: Compute the softmax loss and its gradient using no explicit loops.  #
   # Store the loss in loss and the gradient in dW. If you are not careful     #
   # here, it is easy to run into numeric instability. Don't forget the        #
   # regularization!                                                           #
   #############################################################################
-  pass
+  D, C = W.shape
+  N = X.shape[0]
+  scores = X.dot(W)
+  scores = np.exp(scores)
+  cor = scores[np.arange(N), y]
+  norm = np.sum(scores, axis=1)
+  loss += np.sum(-np.log(cor) + np.log(norm))
+  dW += X.T.dot(scores / norm.reshape(-1, 1))
+  tmp = np.zeros((N, C))
+  tmp[np.arange(N), y] = 1
+  dW -= X.T.dot(tmp)
+  loss /= N
+  loss += reg * 0.5 * np.sum(W * W)
+  dW /= N
+  dW += reg * W
   #############################################################################
   #                          END OF YOUR CODE                                 #
   #############################################################################
 
   return loss, dW
-
