@@ -1,5 +1,4 @@
 import numpy as np
-
 """
 This file implements various first-order update rules that are commonly used for
 training neural networks. Each update rule accepts current weights and the
@@ -59,20 +58,20 @@ def sgd_momentum(w, dw, config=None):
   config.setdefault('learning_rate', 1e-2)
   config.setdefault('momentum', 0.9)
   v = config.get('velocity', np.zeros_like(w))
-  
+
   next_w = None
   #############################################################################
-  # TODO: Implement the momentum update formula. Store the updated value in   #
+  # DONE: Implement the momentum update formula. Store the updated value in   #
   # the next_w variable. You should also use and update the velocity v.       #
   #############################################################################
-  pass
+  v = v * config['momentum'] - dw * config['learning_rate']
+  next_w = w + v
   #############################################################################
   #                             END OF YOUR CODE                              #
   #############################################################################
   config['velocity'] = v
 
   return next_w, config
-
 
 
 def rmsprop(x, dx, config=None):
@@ -95,11 +94,15 @@ def rmsprop(x, dx, config=None):
 
   next_x = None
   #############################################################################
-  # TODO: Implement the RMSprop update formula, storing the next value of x   #
-  # in the next_x variable. Don't forget to update cache value stored in      #  
+  # DONE: Implement the RMSprop update formula, storing the next value of x   #
+  # in the next_x variable. Don't forget to update cache value stored in      #
   # config['cache'].                                                          #
   #############################################################################
-  pass
+  decay_rate = config['decay_rate']
+  config['cache'] *= decay_rate
+  config['cache'] += dx * dx * (1 - decay_rate)
+  next_x = x - dx * config['learning_rate'] / (
+    np.sqrt(config['cache']) + config['epsilon'])
   #############################################################################
   #                             END OF YOUR CODE                              #
   #############################################################################
@@ -129,21 +132,26 @@ def adam(x, dx, config=None):
   config.setdefault('m', np.zeros_like(x))
   config.setdefault('v', np.zeros_like(x))
   config.setdefault('t', 0)
-  
+
   next_x = None
   #############################################################################
-  # TODO: Implement the Adam update formula, storing the next value of x in   #
+  # DONE: Implement the Adam update formula, storing the next value of x in   #
   # the next_x variable. Don't forget to update the m, v, and t variables     #
   # stored in config.                                                         #
   #############################################################################
-  pass
+  m = config['m']
+  v = config['v']
+  beta1 = config['beta1']
+  beta2 = config['beta2']
+  lr = config['learning_rate']
+  eps = config['epsilon']
+  m = beta1 * m + (1 - beta1) * dx
+  v = beta2 * v + (1 - beta2) * dx * dx
+  next_x = x - lr * m / (np.sqrt(v) + eps)
+  config['m'] = m
+  config['v'] = v
   #############################################################################
   #                             END OF YOUR CODE                              #
   #############################################################################
-  
+
   return next_x, config
-
-  
-  
-  
-
