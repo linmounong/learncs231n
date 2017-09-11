@@ -282,14 +282,25 @@ def batchnorm_backward_alt(dout, cache):
   """
   dx, dgamma, dbeta = None, None, None
   #############################################################################
-  # TODO: Implement the backward pass for batch normalization. Store the      #
+  # DONE: Implement the backward pass for batch normalization. Store the      #
   # results in the dx, dgamma, and dbeta variables.                           #
   #                                                                           #
   # After computing the gradient with respect to the centered inputs, you     #
   # should be able to compute gradients with respect to the inputs in a       #
   # single statement; our implementation fits on a single 80-character line.  #
   #############################################################################
-  pass
+
+  # http://cthorey.github.io/backpropagation/
+  x, eps, gamma, beta, r = cache
+  N, D = dout.shape
+  mu = r[0]
+  var = r[3]
+  dbeta = np.sum(dout, axis=0)
+  dgamma = np.sum((x - mu) * (var + eps)**(-1. / 2.) * dout, axis=0)
+  dx = ((1. / N) * gamma * (var + eps)**(-1. / 2.) *
+        (N * dout - np.sum(dout, axis=0) - (x - mu) * (var + eps)**
+         (-1.0) * np.sum(dout * (x - mu), axis=0)))
+
   #############################################################################
   #                             END OF YOUR CODE                              #
   #############################################################################
