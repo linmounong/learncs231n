@@ -409,10 +409,24 @@ def conv_forward_naive(x, w, b, conv_param):
   """
   out = None
   #############################################################################
-  # TODO: Implement the convolutional forward pass.                           #
+  # DONE: Implement the convolutional forward pass.                           #
   # Hint: you can use the function np.pad for padding.                        #
   #############################################################################
-  pass
+  N, C, H, W = x.shape
+  F, C, HH, WW = w.shape
+  stride = conv_param['stride']
+  pad = conv_param['pad']
+  x = np.pad(x, ((0,), (0,), (pad,), (pad,)), 'constant')
+  H_ = 1 + (H + 2 * pad - HH) / stride
+  W_ = 1 + (W + 2 * pad - WW) / stride
+  out = np.zeros((N, F, H_, W_))
+  for i in xrange(H_):
+    for j in xrange(W_):
+      ii = i * stride
+      jj = j * stride
+      out[:, :, i, j] = np.sum(
+        x[:, :, ii:ii + HH, jj:jj + WW].reshape(N, 1, C, HH, WW) * w,
+        axis=(2, 3, 4)) + b
   #############################################################################
   #                             END OF YOUR CODE                              #
   #############################################################################
@@ -435,13 +449,25 @@ def conv_backward_naive(dout, cache):
   """
   dx, dw, db = None, None, None
   #############################################################################
-  # TODO: Implement the convolutional backward pass.                          #
+  # DONE: Implement the convolutional backward pass.                          #
   #############################################################################
-  pass
+  x, w, b, conv_param = cache
+  stride = conv_param['stride']
+  N, C, H, W = x.shape
+  F, C, HH, WW = w.shape
+  N, F, H_, W_ = dout.shape
+  dx = np.zeros_like(x)
+  dw = np.zeros_like(w)
+  db = np.zeros_like(b)
+  for i in xrange(H_):
+    for j in xrange(W_):
+      # TODO
+      pass
+
   #############################################################################
   #                             END OF YOUR CODE                              #
   #############################################################################
-  return dx, dw, db
+  return dx[:, :, pad:-pad, pad:-pad], dw, db
 
 
 def max_pool_forward_naive(x, pool_param):
