@@ -573,13 +573,16 @@ def spatial_batchnorm_forward(x, gamma, beta, bn_param):
   out, cache = None, None
 
   #############################################################################
-  # TODO: Implement the forward pass for spatial batch normalization.         #
+  # DONE: Implement the forward pass for spatial batch normalization.         #
   #                                                                           #
   # HINT: You can implement spatial batch normalization using the vanilla     #
   # version of batch normalization defined above. Your implementation should  #
   # be very short; ours is less than five lines.                              #
   #############################################################################
-  pass
+  N, C, H, W = x.shape
+  out, cache = batchnorm_forward(
+    np.moveaxis(x, 1, -1).reshape(-1, C), gamma, beta, bn_param)
+  out = np.moveaxis(out.reshape(N, H, W, C), -1, 1)
   #############################################################################
   #                             END OF YOUR CODE                              #
   #############################################################################
@@ -603,13 +606,16 @@ def spatial_batchnorm_backward(dout, cache):
   dx, dgamma, dbeta = None, None, None
 
   #############################################################################
-  # TODO: Implement the backward pass for spatial batch normalization.        #
+  # DONE: Implement the backward pass for spatial batch normalization.        #
   #                                                                           #
   # HINT: You can implement spatial batch normalization using the vanilla     #
   # version of batch normalization defined above. Your implementation should  #
   # be very short; ours is less than five lines.                              #
   #############################################################################
-  pass
+  N, C, H, W = dout.shape
+  dx, dgamma, dbeta = batchnorm_backward(
+    np.moveaxis(dout, 1, -1).reshape(-1, C), cache)
+  dx = np.moveaxis(dx.reshape(N, H, W, C), -1, 1)
   #############################################################################
   #                             END OF YOUR CODE                              #
   #############################################################################
